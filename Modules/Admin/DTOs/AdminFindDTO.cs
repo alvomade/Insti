@@ -7,6 +7,6 @@ namespace Insti.Modules.Admin.DTOs
         public Guid id { get; set; }
         public string name { get; set; }   
         
-        public IEnumerable<AdminInstitutionModel>? adminInstitutions { get; set; } 
+        public  IEnumerable<AdminInstitutionModel>? adminInstitutions { get; set; } 
     }
 }

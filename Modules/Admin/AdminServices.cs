@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Insti.Modules.AdminInstitution.DTOs;
+using Insti.Modules.AdminInstitution;
 namespace Insti.Modules.Admin
 {
     public class AdminServices
@@ -13,68 +15,72 @@ namespace Insti.Modules.Admin
         {
             _context = context;
         }
-        public async Task addAdmin(AdminAddDTO addAdmin)
+        public async Task<AdminModel> addAdmin(AdminAddDTO addAdmin)
         {
             var admin = new AdminModel
             {
                 name = addAdmin.name,
-                adminInstitutuions = []
+                adminInstitutions = []
             };
             _context.Admins.Add(admin);
             await _context.SaveChangesAsync();
+            return admin;
         }
 
 
-        public async Task<string>? findAdmin(Guid id)
+        public async Task<AdminModel?> findAdmin(Guid id)
         {
             var admin = await _context.Admins
-                .Include(a => a.adminInstitutuions)
+                .Include(a => a.adminInstitutions)
+                .ThenInclude(ai=>ai.Institution)
                 .FirstOrDefaultAsync(a => a.id == id);
 
             
             if(admin == null) return null;
 
-            var jsonOptions = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                MaxDepth = 64 // Set the maximum depth to an appropriate value
-            };
-
-            
-            var adminDTO = new AdminFindDTO
-            { 
-                name= admin.name,   
-                id=admin.id,
-                adminInstitutions=admin.adminInstitutuions
-            };
-            var jsonString = JsonSerializer.Serialize(adminDTO, jsonOptions);
-            return jsonString;
+           
+            return admin;
         }
 
-        public async Task<IEnumerable<AdminFindDTO>> findAllAdmins()
+        public async Task<IEnumerable<AdminModel>> findAllAdmins()
         {
-            var admins = await _context.Admins.ToListAsync();
-            
+            var admins = await _context.Admins
+                .Include(admin=>admin.adminInstitutions)
+                .ThenInclude(ai=>ai.Institution)
+                .ToListAsync();
+
             //var result = (ICollection<dynamic>)admins.Select(a => new AdminDTO(a).defaultModel());
-            var allAdmins = admins.Select(admin => new AdminFindDTO{ 
-                name=admin.name,
-                id=admin.id,
-                adminInstitutions = admin.adminInstitutuions
-            });
-            return allAdmins;
+            // var allAdmins = admins.Select(admin => new AdminFindDTO
+            // {
+            //     name = admin.name,
+            //     id = admin.id,
+            //     adminInstitutions=(IEnumerable<AdminInstitutionModel>)admin.adminInstitutions
+            //     .Select(ai=>ai=new AdminInstitutionModel{
+            //         Institution=ai.Institution
+            //     })
+            //     .ToList()
+            //     // adminInstitutions = (IEnumerable<AdminInstitutionModel>)admin.adminInstitutions.
+            //     // Select(ai => new AdminInstitutionModel
+            //     // {
+            //     //     Admin = ai.Admin, 
+            //     //     Institution = ai.Institution
+            //     // }).ToList()
+            // }) ;
+            // Console.WriteLine(allAdmins);
+            return admins;
 
 
         }
 
-        public async Task deleteAdmin(Guid id)
+        public async Task<AdminModel?> deleteAdmin(Guid id)
         {
             var admin = await _context.Admins.FindAsync(id);
 
-            if(admin == null) return;
+            if(admin == null) return null;
 
             _context.Admins.Remove(admin);
             await _context.SaveChangesAsync();
-
+            return admin;
         }
 
         public async Task<IEnumerable<AdminFindDTO>> findAdminByDate(DateTime? startDate, DateTime? endDate)
@@ -95,13 +101,17 @@ namespace Insti.Modules.Admin
             });
         }
 
-        public async Task editAdmin(Guid id, AdminEditDTO editedAdmin) {
+        public async Task<AdminModel?> editAdmin(Guid id, string name) {
             var admin=await _context.Admins.FindAsync(id);
-            if(admin == null) return;
+            if(admin == null) return null;
+            var editedAdmin=new AdminEditDTO{
+                name=name
+            };
 
             admin.name = editedAdmin.name;
             
             await _context.SaveChangesAsync();
+            return admin;
         }
     }
 }

@@ -42,16 +42,7 @@ namespace Insti.Controller
             
         }
 
-        [HttpGet]
-        public async Task<ActionResult> findAllAdmins() {
-            try { 
-                var theAdmins=await adminServices.findAllAdmins();  
-                return Ok(theAdmins);
-            }catch (Exception ex)
-            {
-                return BadRequest(ex.Message);  
-            }
-        }
+        
 
         [HttpDelete]
         [Route("{id}")]
@@ -80,10 +71,10 @@ namespace Insti.Controller
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> editAdminData(Guid id,AdminEditDTO newChanges) {
+        public async Task<IActionResult> editAdminData(Guid id,string name) {
             try
             {
-                await adminServices.editAdmin(id,newChanges);
+                await adminServices.editAdmin(id,name);
                 return Ok("admin data edited succesfully");
             }
             catch (Exception e) {

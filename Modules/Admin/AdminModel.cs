@@ -8,8 +8,8 @@ namespace Insti.Modules.Admin
     {
         [Key]
         public Guid id { get; set; }
-        public required string name { get; set; }
-        public required IEnumerable<AdminInstitutionModel> adminInstitutuions { get; set; }
+        public  string name { get; set; }
+        public required IEnumerable<AdminInstitutionModel> adminInstitutions { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime createdAt { get; set; }
@@ -17,9 +17,6 @@ namespace Insti.Modules.Admin
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime updatedAt { get; set; }
 
-        public static implicit operator AdminModel(ValueTask<AdminModel?> v)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

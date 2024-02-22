@@ -4,6 +4,10 @@ using Insti.Context;
 using Insti.Modules.Admin;
 using Insti.Modules.Institution;
 using Insti.Modules.AdminInstitution;
+using static Insti.Middlewares.HandleError;
+using Insti.Middlewares;
+using Insti.Queries;
+using insti.Queries;
 namespace Insti
 {
     public class Program
@@ -20,13 +24,21 @@ namespace Insti
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<InstiDb>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("insti"));
-            });
+           
+                options.UseSqlServer(builder.Configuration.GetConnectionString("insti")),
+                ServiceLifetime.Scoped
+            );
+        
             builder.Services.AddScoped<AdminServices>();
             builder.Services.AddScoped<InstitutionServices>();
             builder.Services.AddScoped<AdminInstitutionServices>();
 
+            builder.Services.AddScoped<AdminQueries>();
+            builder.Services.AddScoped<AdminMutations>();
+
+            builder.Services.AddGraphQLServer()
+            .AddQueryType<AdminQueries>()
+            .AddMutationType<AdminMutations>();
 
             var app = builder.Build();
 
@@ -37,12 +49,18 @@ namespace Insti
                 app.UseSwaggerUI();
             }
 
+                        
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
+            //app.UseMiddleware<HandleError>();
 
+            app.UseRouting();
+
+         
             app.MapControllers();
+            app.MapGraphQL("/graphql");
 
             app.Run();
         }
