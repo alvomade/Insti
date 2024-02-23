@@ -74,6 +74,7 @@ namespace Insti.Modules.Admin
 
         public async Task<AdminModel?> deleteAdmin(Guid id)
         {
+            Console.WriteLine("IMEFIKA HAPA");
             var admin = await _context.Admins.FindAsync(id);
 
             if(admin == null) return null;

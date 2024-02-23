@@ -41,7 +41,7 @@ namespace Insti.Modules.Institution
             return institutionDTO;
         }
 
-        public async Task<IEnumerable<InstitutionFindDTO>> findAllInstitutions()
+        public async Task<IEnumerable<InstitutionModel>> findAllInstitutions()
         {
             var institutions = await _context.Institutions
                 .Include(insti=>insti.adminInstitutuions)
@@ -54,7 +54,7 @@ namespace Insti.Modules.Institution
                 id = institution.id,
                 adminInstitutions = institution.adminInstitutuions
             });
-            return allinstitutions;
+            return institutions;
 
 
         }

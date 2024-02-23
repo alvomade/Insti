@@ -1,11 +1,13 @@
-using Insti.Modules.Admin;
+
+
 using Insti.Modules.Admin.DTOs;
 
-namespace insti.Queries
+namespace Insti.Modules.Admin
 {
-    public class AdminMutations{
+    [ExtendObjectType("Mutation")]
+    public class AdminMutationResolvers{
         private readonly AdminServices _services;
-        public AdminMutations(AdminServices services)=>_services=services;
+        public AdminMutationResolvers(AdminServices services)=>_services=services;
 
         public async Task<AdminModel?> addAdmin(string name){
           
@@ -22,7 +24,7 @@ namespace insti.Queries
         public async Task<AdminModel?>deleteAdmin(Guid id){
             try{
                 var admin=await _services.deleteAdmin(id);
-            return admin;
+                return admin;
         
             }catch(Exception e){Console.WriteLine(e); return null;}
             

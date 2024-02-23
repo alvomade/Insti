@@ -1,18 +1,17 @@
-﻿using Insti.Modules.Admin;
-using Insti.Modules.Admin.DTOs;
-using Microsoft.AspNetCore.Mvc;
+﻿
 
-namespace Insti.Queries
+namespace Insti.Modules.Admin
 {
-    public class AdminQueries { 
+    [ExtendObjectType("Query")]
+    public class AdminQueryResolvers { 
         private readonly AdminServices adminServices;
 
-        public AdminQueries(AdminServices _adminServices)
+        public AdminQueryResolvers(AdminServices _adminServices)
         {
             this.adminServices = _adminServices;
         }
     
-        public async Task<IEnumerable<AdminModel>> findAllAdmins()
+        public async Task<IEnumerable<AdminModel>> findAdmins()
         {
       
           
