@@ -6,7 +6,6 @@ using Insti.Modules.Institution;
 using Insti.Modules.AdminInstitution;
 using static Insti.Middlewares.HandleError;
 using Insti.Middlewares;
-using insti.Schema;
 namespace Insti
 {
     public class Program
@@ -34,12 +33,16 @@ namespace Insti
 
             builder.Services.AddScoped<AdminQueryResolvers>();
             builder.Services.AddScoped<AdminMutationResolvers>();
+            builder.Services.AddScoped<InstitutionQueryResolvers>();
+            builder.Services.AddScoped<InstitutionMutationResolvers>();
 
             builder.Services.AddGraphQLServer()
             .AddQueryType(q=>q.Name("Query"))
                 .AddType<AdminQueryResolvers>()
+                .AddType<InstitutionQueryResolvers>()
             .AddMutationType(m=>m.Name("Mutation"))
                 .AddType<AdminMutationResolvers>()
+                .AddType<InstitutionMutationResolvers>()
             ;
 
             var app = builder.Build();

@@ -16,12 +16,12 @@ namespace Insti.Modules.Institution
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddNewInstitution(InstitutionAddDTO addInstitutionDTO)
+        public async Task<IActionResult> AddNewInstitution(string name)
         {
             try
             {
 
-                await _services.addInstitution(addInstitutionDTO);
+                await _services.addInstitution(name);
                 return Ok("Institution added successfully");
             }
             catch (Exception ex)
@@ -92,11 +92,11 @@ namespace Insti.Modules.Institution
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> editInstitutionData(Guid id, InstitutionEditDTO newChanges)
+        public async Task<IActionResult> editInstitutionData(Guid id, string name)
         {
             try
             {
-                await _services.editInstitution(id, newChanges);
+                await _services.editInstitution(id, name);
                 return Ok("Institution data edited succesfully");
             }
             catch (Exception e)

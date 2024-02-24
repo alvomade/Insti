@@ -11,23 +11,27 @@ namespace Insti.Modules.Institution
             _context=context;
         }
 
-        public async Task addInstitution(InstitutionAddDTO newInstitution) {
-            if (newInstitution == null) return;
+        public async Task<InstitutionFindDTO?> addInstitution(string name) {
+            if (name == null) return null;
 
             var institution = new InstitutionModel {
-                name = newInstitution.name
+                name = name
             };
 
              _context.Institutions.Add(institution);
             await _context.SaveChangesAsync();
-
+            return new InstitutionFindDTO{
+                name=institution.name,
+                adminInstitutions=null
+            };
         }
 
         public async Task<InstitutionFindDTO?> findInstitution(Guid id)
         {
             var institution = await _context.Institutions
-                .Include(institution => institution.adminInstitutuions)
-                .FirstOrDefaultAsync(institution => institution.id == id);
+                .Include(insti=>insti.adminInstitutuions)
+                .ThenInclude(ai=>ai.Admin)
+                .FirstOrDefaultAsync(insti => insti.id == id);
 
 
             if (institution == null) return null;
@@ -35,16 +39,18 @@ namespace Insti.Modules.Institution
             var institutionDTO = new InstitutionFindDTO
             {
                 name = institution.name,
-                id = institution.id
+                id = institution.id,
+                adminInstitutions=institution.adminInstitutuions
             };
 
             return institutionDTO;
         }
 
-        public async Task<IEnumerable<InstitutionModel>> findAllInstitutions()
+        public async Task<IEnumerable<InstitutionFindDTO>> findAllInstitutions()
         {
             var institutions = await _context.Institutions
                 .Include(insti=>insti.adminInstitutuions)
+                .ThenInclude(ai=>ai.Admin)
                 .ToListAsync();
 
             //var result = (ICollection<dynamic>)institutions.Select(a => new institutionDTO(a).defaultModel());
@@ -54,20 +60,26 @@ namespace Insti.Modules.Institution
                 id = institution.id,
                 adminInstitutions = institution.adminInstitutuions
             });
-            return institutions;
+            return allinstitutions;
 
 
         }
-
-        public async Task deleteInstitution(Guid id)
+        public async Task<InstitutionFindDTO?> deleteInstitution(Guid id)
         {
-            var institution = await _context.Institutions.FindAsync(id);
+            var institution = await _context.Institutions
+            .Include(i=>i.adminInstitutuions)
+            .ThenInclude(ai=>ai.Admin)
+            .FirstOrDefaultAsync(i=>i.id==id);
 
-            if (institution == null) return;
+            if (institution == null) return null;
 
             _context.Institutions.Remove(institution);
             await _context.SaveChangesAsync();
 
+            return new InstitutionFindDTO{
+                name=institution.name,
+                adminInstitutions=institution.adminInstitutuions
+            };
         }
 
         public async Task<IEnumerable<InstitutionFindDTO>> findInstitutionByDate(DateTime? startDate, DateTime? endDate)
@@ -90,14 +102,19 @@ namespace Insti.Modules.Institution
             });
         }
 
-        public async Task editInstitution(Guid id, InstitutionEditDTO editedinstitution)
+        public async Task<InstitutionEditDTO?> editInstitution(Guid id,string name)
         {
             var institution = await _context.Institutions.FindAsync(id);
-            if (institution == null) return;
+            if (institution == null) return null;
 
-            institution.name = editedinstitution.name;
+            institution.name = name;
 
             await _context.SaveChangesAsync();
+            
+            return new InstitutionEditDTO{
+                name=institution.name
+
+            };
         }
     }
 }
